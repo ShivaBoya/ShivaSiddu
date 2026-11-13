@@ -1,0 +1,118 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  --sat: env(safe-area-inset-top, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+}
+
+html, body, #root {
+  height: 100%;
+  height: 100dvh;
+  overflow: hidden;
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Touch friendly minimums */
+button, a, [role="button"] {
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #100B13;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #591D35;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #D98BA9;
+}
+
+/* Glassmorphism Classes */
+.glass-panel {
+  background: rgba(50, 20, 38, 0.45);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(217, 139, 169, 0.18);
+  box-shadow: 0 8px 32px 0 rgba(16, 11, 19, 0.5);
+}
+
+.glass-panel-gold {
+  background: rgba(30, 15, 25, 0.55);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(243, 216, 196, 0.25);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), inset 0 0 15px rgba(243, 216, 196, 0.05);
+}
+
+.glass-pill {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* Luxury Shimmer & Glow */
+.text-gold-gradient {
+  background: linear-gradient(135deg, #FFF8F5 0%, #F3D8C4 50%, #D98BA9 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-rose-gradient {
+  background: linear-gradient(135deg, #F3D8C4 0%, #D98BA9 60%, #9E4770 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-ethereal {
+  text-shadow: 0 0 20px rgba(217, 139, 169, 0.6), 0 0 40px rgba(243, 216, 196, 0.3);
+}
+
+.glow-card {
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.glow-card:hover {
+  border-color: rgba(217, 139, 169, 0.45);
+  box-shadow: 0 12px 40px -10px rgba(217, 139, 169, 0.35);
+  transform: translateY(-4px);
+}
+
+/* Starfield twinkles */
+@keyframes twinkle {
+  0%, 100% { opacity: 0.2; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+.animate-twinkle {
+  animation: twinkle 3s ease-in-out infinite;
+}
+
+/* Hide cursor when custom cursor active */
+@media (pointer: fine) {
+  body.has-custom-cursor,
+  body.has-custom-cursor a,
+  body.has-custom-cursor button,
+  body.has-custom-cursor input {
+    cursor: none !important;
+  }
+}
+
