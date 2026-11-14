@@ -3,18 +3,29 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Heart } from 'lucide-react';
 import CinematicRose from '../components/CinematicRose';
 import RomanticScene01Canvas from '../components/RomanticScene01Canvas';
+import BirthdayLockModal from '../components/BirthdayLockModal';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 
-export default function Scene01Encounter({ onEnterUniverse, isTransitioning }) {
+export default function Scene01Encounter({
+  onEnterUniverse,
+  isTransitioning,
+  isLocked = true,
+  countdown,
+  onDevUnlock,
+  onStartMusic
+}) {
   const prefersReducedMotion = useReducedMotion();
   const [isBursting, setIsBursting] = useState(false);
   const [burstOrigin, setBurstOrigin] = useState(null);
   const [showHeartPulse, setShowHeartPulse] = useState(false);
+  const [showLockModal, setShowLockModal] = useState(false);
 
   const nameLetters = "INDU".split("");
 
   const handleEnterClick = (e) => {
     if (isBursting || isTransitioning) return;
+
+    if (onStartMusic) onStartMusic();
 
     // Capture button coordinate for fountain origin
     const rect = e.currentTarget.getBoundingClientRect();
@@ -26,10 +37,19 @@ export default function Scene01Encounter({ onEnterUniverse, isTransitioning }) {
     setIsBursting(true);
     setShowHeartPulse(true);
 
-    // After 750ms of cinematic heart burst and light pulse, hand over to galaxy transition
-    setTimeout(() => {
-      onEnterUniverse();
-    }, 750);
+    if (isLocked) {
+      // LOCKED UNTIL BIRTHDAY: Show gorgeous countdown timing modal
+      setTimeout(() => {
+        setIsBursting(false);
+        setShowHeartPulse(false);
+        setShowLockModal(true);
+      }, 750);
+    } else {
+      // Unlocked on birthday (or dev override): Transition to Scene 02
+      setTimeout(() => {
+        onEnterUniverse();
+      }, 750);
+    }
   };
 
   return (
@@ -175,6 +195,14 @@ export default function Scene01Encounter({ onEnterUniverse, isTransitioning }) {
           ✨ Best experienced with sound &bull; Handcrafted with love
         </motion.p>
       </div>
+
+      {/* 8. BIRTHDAY TIMING LOCK MODAL (Displays when button clicked before Dec 1) */}
+      <BirthdayLockModal
+        isOpen={showLockModal}
+        onClose={() => setShowLockModal(false)}
+        countdown={countdown || { days: 16, hours: 5, minutes: 18, seconds: 42 }}
+        onDevUnlock={onDevUnlock}
+      />
     </section>
   );
 }

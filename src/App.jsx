@@ -30,9 +30,23 @@ export default function App() {
   const [activePhotoIndex, setActivePhotoIndex] = useState(null);
   const [customPhotoModal, setCustomPhotoModal] = useState(null);
 
+  const [isDevUnlocked, setIsDevUnlocked] = useState(() => {
+    return typeof window !== 'undefined' && sessionStorage.getItem('induverse_dev_unlocked') === 'true';
+  });
+
+  const handleDevUnlock = () => {
+    setIsDevUnlocked(true);
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('induverse_dev_unlocked', 'true');
+    }
+  };
+
   const audioState = useAudio();
   const countdown = useCountdown();
   const prefersReducedMotion = useReducedMotion();
+
+  // STRICT LOCK: Lock all scenes except Scene 01 until December 1, 2026 (or dev unlock)
+  const isLocked = !countdown.isBirthday && !isDevUnlocked;
 
   // Browser History integration (popstate back/forward support)
   useEffect(() => {
@@ -40,12 +54,16 @@ export default function App() {
 
     const handlePopState = (e) => {
       if (e.state && typeof e.state.scene === 'number') {
+        if (e.state.scene > 0 && isLocked) {
+          setActiveSceneIndex(0);
+          return;
+        }
         setActiveSceneIndex(e.state.scene);
       }
     };
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
-  }, []);
+  }, [isLocked]);
 
   // Pause audio and heavy animations when phone screen locked or tab hidden
   useEffect(() => {
@@ -62,6 +80,12 @@ export default function App() {
   const navigateToScene = useCallback(
     (targetIndex, type) => {
       if (isTransitioning) return; // Prevent double-clicks
+
+      // Strictly lock scenes > 0 if locked
+      if (targetIndex > 0 && isLocked) {
+        setActiveSceneIndex(0);
+        return;
+      }
 
       setIsTransitioning(true);
       setTransitionType(type);
@@ -81,7 +105,7 @@ export default function App() {
         setTransitionType(null);
       }, finishDelay);
     },
-    [isTransitioning, prefersReducedMotion]
+    [isTransitioning, prefersReducedMotion, isLocked]
   );
 
   // Scene-by-Scene Curiosity Transitions
@@ -185,6 +209,10 @@ export default function App() {
               <Scene01Encounter
                 onEnterUniverse={handleEnterUniverse}
                 isTransitioning={isTransitioning}
+                isLocked={isLocked}
+                countdown={countdown}
+                onDevUnlock={handleDevUnlock}
+                onStartMusic={audioState.startMusic}
               />
             </motion.div>
           )}
