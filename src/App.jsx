@@ -23,7 +23,15 @@ import { INDU_GALLERY } from './data/memories';
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
-  const [activeSceneIndex, setActiveSceneIndex] = useState(0);
+  const [activeSceneIndex, setActiveSceneIndex] = useState(() => {
+    if (typeof window === 'undefined') return 0;
+    const params = new URLSearchParams(window.location.search);
+    const sceneParam = params.get('scene');
+    if (sceneParam && (params.get('preview') === 'shiva' || sessionStorage.getItem('induverse_dev_unlocked') === 'true')) {
+      return parseInt(sceneParam, 10) || 0;
+    }
+    return 0;
+  });
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [transitionType, setTransitionType] = useState(null);
 
@@ -31,7 +39,10 @@ export default function App() {
   const [customPhotoModal, setCustomPhotoModal] = useState(null);
 
   const [isDevUnlocked, setIsDevUnlocked] = useState(() => {
-    return typeof window !== 'undefined' && sessionStorage.getItem('induverse_dev_unlocked') === 'true';
+    if (typeof window === 'undefined') return false;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('preview') === 'shiva' || params.get('preview') === 'true') return true;
+    return sessionStorage.getItem('induverse_dev_unlocked') === 'true';
   });
 
   const handleDevUnlock = () => {
